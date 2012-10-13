@@ -1,0 +1,23 @@
+#!/bin/bash
+
+lo=50
+
+# get-temp script returns the current max temp of your cores
+max=`sensors | grep 'Core' | sed 's/\(Core[^:]*\):[^+]*+\([^\.]*\)\.0°C.*/\2/g' | sort -r | head -n +1`
+hi=`sensors | grep 'Core' | sed 's/\(Core[^:]*\):[^+]*+\([^\.]*\)\.0°C *(high = +\([^\.]*\).0°C,.*/\3/g' | sort -r | head -n +1`
+
+med=`expr \( $hi - $lo \) / 4 + $lo`
+
+medhi=`expr \( $hi - $lo \) / 2 + $lo`
+
+set +x
+if expr $max '>=' $hi > /dev/null; then
+    echo "<fc=#e6744c>$max°C</fc>"
+elif expr $max '>=' $medhi > /dev/null; then
+    echo "<fc=#ff9900>$max°C</fc>"
+elif expr $max '>=' $med > /dev/null; then
+    echo "<fc=#ffff00>$max°C</fc>"
+else
+    echo "<fc=#00ff00>$max°C</fc>"
+fi
+
