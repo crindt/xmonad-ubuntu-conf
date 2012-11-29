@@ -37,15 +37,16 @@ xcompmgr -n &
 # connected screens and find out what names you should use to refer to them.
 
 # Activate primary screen 
-xrandr --output LVDS-1 --auto --primary
+xrandr --output LVDS1 --auto --mode 1600x900 --primary
 
 # If we find that a screen is connected via VGA, activate it and position it
 # to the left of the primary screen.
-xrandr | grep 'VGA-1 connected' | ifne xrandr --output VGA-1 --auto --left-of LVDS-1
+xrandr | grep 'VGA-*1 connected' | ifne xrandr --output VGA1 --auto --mode 1440x900  --right-of LVDS1
 
 # If we find that a screen is connected via DVI, activate it and position it
 # to the left of the primary screen.
-xrandr | grep 'DP-1 connected' | ifne xrandr --output DP-1 --auto --left-of LVDS-1
+xrandr | grep 'DP-*2 connected' | ifne xrandr --output LVDS1 --mode 1440x900
+xrandr | grep 'DP-*2 connected' | ifne xrandr --output DP2 --mode 1440x900 --same-as LVDS1
 
 
 #
@@ -80,7 +81,18 @@ nitrogen --restore &
 # - window-strut "none" means windows are allowed to cover the tray. In
 #   other words, trust xmonad to handle this part.
 #
-stalonetray \
+xrandr | grep 'DP-*2 connected' | ifne stalonetray \
+  --icon-gravity E \
+  --geometry 5x1-1440+0 \
+  --max-geometry 5x1-1440+0 \
+  --background '#000000' \
+  --skip-taskbar \
+  --icon-size 24 \
+  --kludges force_icons_size \
+  --window-strut none \
+&
+
+xrandr | grep -v 'DP-*2 connected' | ifne stalonetray \
   --icon-gravity E \
   --geometry 5x1-0+0 \
   --max-geometry 5x1-0+0 \
