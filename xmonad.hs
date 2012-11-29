@@ -29,6 +29,8 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Actions.Plane
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.UrgencyHook
+import XMonad.Actions.CycleWS
+import XMonad.Actions.PhysicalScreens
 import qualified XMonad.StackSet as W
 import qualified Data.Map as M
 import Data.Ratio ((%))
@@ -264,6 +266,7 @@ myManagementHooks = [
   , (className =? "Empathy") --> doF (W.shift "7:Chat")
   , (className =? "Pidgin") --> doF (W.shift "7:Chat")
   , (className =? "Gimp-2.8") --> doF (W.shift "9:Pix")
+  , (title =? "Oracle VM VirtualBox Manager") --> doF (W.shift "0:VM")
   ]
 
 
@@ -315,12 +318,26 @@ myKeys = myKeyBindings ++
        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
   ] ++
   M.toList (planeKeys myModMask (Lines 4) Finite) ++
+
+-- crindt: modified per screenBy entry at: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-CycleWS.html
+-- mod-{w,e}, Switch to previous/next Xinerama screen
+-- mod-shift-{w,e}, Move client to previous/next Xinerama screen
+--  [
+--    ((m .|. myModMask, key), sc >>= screenWorkspace
+--      >>= flip whenJust (windows . f))
+--      | (key, sc) <- zip [xK_w, xK_e] [(screenBy (-1)),(screenBy (1))]
+--      , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
+--  ]
+--
+-- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
+-- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
+--
   [
-    ((m .|. myModMask, key), screenWorkspace sc
-      >>= flip whenJust (windows . f))
-      | (key, sc) <- zip [xK_w, xK_e, xK_r] [1,0,2]
-      , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
+    ((myModMask .|. mask, key), f sc)
+       | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
+       , (f, mask) <- [(viewScreen, 0), (sendToScreen, shiftMask)]
   ]
+
 
 
 {-
