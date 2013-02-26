@@ -32,6 +32,9 @@ if [ -z "$(pgrep system-config-printer-applet)" ] ; then
     system-config-printer-applet &
 fi
 
+# twitter monitor
+( cd $HOME/hacks/twitcler; node ./lib/twitcler --consumer_key=4Bp8CjoZ6MaYHNBANLPw --consumer_secret=QDtw4S29pK3b6LLxNWxrT6FDjeuatJBYlLzOnsLCs --access_token_key=48760076-J1tCPB2laPh19qe4ICXlpQPCgAB8PydcxoGQbBDXq --access_token_secret=tpPfhYmwoxGx9N2Njp5BWn6toFIBUD5y9EjyTJa2PR4 ) &
+
 #
 # APPLICATION LAUNCHER
 #

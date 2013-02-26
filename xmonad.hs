@@ -34,6 +34,7 @@ import XMonad.Actions.PhysicalScreens
 import qualified XMonad.StackSet as W
 import qualified Data.Map as M
 import Data.Ratio ((%))
+import XMonad.Actions.SpawnOn
 
 {-
   Xmonad configuration variables. These settings control some of the
@@ -208,6 +209,8 @@ myKeyBindings =
     , ((0, 0x1008FF12), spawn "amixer -q set Master toggle")
     , ((0, 0x1008FF11), spawn "amixer -q set Master 10%-")
     , ((0, 0x1008FF13), spawn "amixer -q set Master 10%+")
+    , ((myModMask, xK_d), spawn "xrandr --output LVDS1 --auto && xrandr --output DP2 --mode 1024x768")
+    , ((myModMask .|. shiftMask, xK_d), spawn "$HOME/.xmonad/reset-screen")
   ]
 
 
@@ -267,6 +270,8 @@ myManagementHooks = [
   , (className =? "Pidgin") --> doF (W.shift "7:Chat")
   , (className =? "Gimp-2.8") --> doF (W.shift "9:Pix")
   , (title =? "Oracle VM VirtualBox Manager") --> doF (W.shift "0:VM")
+  , (className =? "Emacs24" ) --> doF (W.shift "5:Dev")
+  , (className =? "Chromium" <&&> title =? ".*gmail.*") --> doF (W.shift "3:Mail")
   ]
 
 
@@ -360,7 +365,12 @@ main = do
   , startupHook = do
       windows $ W.greedyView startupWorkspace
       spawn "~/.xmonad/startup-hook"
+      spawnOn "3:Mail" "chromium-browser --new-window http://gmail.com http://twitter.com http://plus.google.com"
+      spawnOn "4:Docs" "chromium-browser --new-window http://tracker.ctmlabs.net"
+      spawnOn "5:Dev"  "emacs"
+      spawnOn "6:Web"  "chromium-browser --new-window http://reader.google.com"
   , manageHook = manageHook defaultConfig
+      <+> manageSpawn
       <+> composeAll myManagementHooks
       <+> manageDocks
   , logHook = dynamicLogWithPP $ xmobarPP {
