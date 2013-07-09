@@ -35,6 +35,7 @@ import qualified XMonad.StackSet as W
 import qualified Data.Map as M
 import Data.Ratio ((%))
 import XMonad.Actions.SpawnOn
+import XMonad.Layout.IndependentScreens
 
 {-
   Xmonad configuration variables. These settings control some of the
@@ -318,12 +319,11 @@ myKeys = myKeyBindings ++
        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
   ] ++
   [
-    ((m .|. myModMask, k), windows $ f i)
+    ((m .|. myModMask, k), windows $ onCurrentScreen f i)
        | (i, k) <- zip myWorkspaces numKeys
        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
   ] ++
-  M.toList (planeKeys myModMask (Lines 4) Finite) ++
-
+  M.toList (planeKeys myModMask (Lines 4) Finite)
 -- crindt: modified per screenBy entry at: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Actions-CycleWS.html
 -- mod-{w,e}, Switch to previous/next Xinerama screen
 -- mod-shift-{w,e}, Move client to previous/next Xinerama screen
@@ -337,11 +337,11 @@ myKeys = myKeyBindings ++
 -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
 -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
 --
-  [
-    ((myModMask .|. mask, key), f sc)
-       | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
-       , (f, mask) <- [(viewScreen, 0), (sendToScreen, shiftMask)]
-  ]
+--  [
+--    ((myModMask .|. mask, key), f sc)
+--       | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
+--       , (f, mask) <- [(viewScreen, 0), (sendToScreen, shiftMask)]
+--  ]
 
 
 
@@ -359,7 +359,8 @@ main = do
   , terminal = myTerminal
   , borderWidth = myBorderWidth
   , layoutHook = myLayouts
-  , workspaces = myWorkspaces
+--  , workspaces = myWorkspaces
+  , workspaces = withScreens 2 myWorkspaces
   , modMask = myModMask
   , handleEventHook = fullscreenEventHook
   , startupHook = do
@@ -385,3 +386,5 @@ main = do
     }
   }
     `additionalKeys` myKeys
+
+
